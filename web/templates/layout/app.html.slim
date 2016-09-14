@@ -1,0 +1,17 @@
+doctype html
+html lang="en"
+  head
+    meta charset="utf-8"
+    meta http-equiv="X-UA-Compatible" content="IE=edge"
+    meta name="viewport" content="width=device-width, initial-scale=1"
+    meta name="description" content=""
+    meta name="author" content=""
+    title todo Plugin
+    link rel="stylesheet" href="#{static_path(@conn, "/css/app.css")}" data-turbolinks-track="reload"
+  body class=body_css_class(@conn) data-view=data_view(@conn) data-debug=data_debug
+    = render "navbar.html", conn: @conn
+    main
+      = show_flash(@conn)
+      = render @view_module, @view_template, assigns 
+    = render "footer.html", conn: @conn 
+    script src="#{static_path(@conn, "/js/app.js")}" data-turbolinks-track="reload"
