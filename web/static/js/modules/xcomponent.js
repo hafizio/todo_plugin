@@ -7,19 +7,26 @@ import xcomponent from "xcomponent/dist/xcomponent"
 
 function initXChild() {
   window.Todo = xcomponent.create({
-    tag: 'postco-widget',
-    //url: 'https://todo-plugin-staging.herokuapp.com/map',
-    url: 'https://c48acd39.ngrok.io/map',
+    tag: 'todo-widget',
+    url: 'https://f9544005.ngrok.io',
     singleton: true,
     props: {
-      apiKey: {
+      apiToken: {
         type: 'string',
+        required: true
+      },
+      onItemAdd: {
+        type: 'function',
+        required: true
+      },
+      onItemsCleared: {
+        type: 'function',
         required: true
       }
     },
     dimensions: {
       width: 375,
-      height: 667
+      height: 300
     },
     contexts: {
       iframe: true,
@@ -31,5 +38,5 @@ function initXChild() {
 }
 
 function attachXChild() {
-  window.Todo.attach({})
+  window.TodoPlugin = window.Todo.attach({})
 }

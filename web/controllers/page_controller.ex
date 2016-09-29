@@ -2,11 +2,11 @@ defmodule TodoPlugin.PageController do
   use TodoPlugin.Web, :controller
 
   def index(conn, params) do
-    #RailsApi.start
-    #todos = RailsApi.get!("/").body
+    RailsApi.start
+    todos = RailsApi.get!("/").body
 
     props = %{
-      "items" => ["Hafiz", "Atiqah", "Wafa"]
+      "items" => todos
     }
 
     result = TodoPlugin.ReactIO.json_call!(%{
@@ -15,6 +15,10 @@ defmodule TodoPlugin.PageController do
     })
 
     render(conn, "index.html", html: result["html"], props: props)
+  end
+
+  def about(conn, _params) do
+    render(conn, "about.html")
   end
 
 end

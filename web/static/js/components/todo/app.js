@@ -3,32 +3,17 @@ import ReactDOM from "react-dom"
 
 export default class App extends React.Component {
   constructor(props){
-    super(props);
-    this.addEvent = this.addEvent.bind(this);
-    this.onClear = this.onClear.bind(this);
+    super(props)
   }
 
   state = {
     items: this.props.items
   }
 
-  render() {
-    const list = this.state.items.map((item, index) => {
-      return <li key={index}><TodoItem item={item} /></li>;
-    })
-
-    return(
-      <div>
-        <ul>{list}</ul>
-        <NewTodoItem addEvent={this.addEvent} onClear={this.onClear} />
-      </div>
-    );
-  }
-
   addEvent(todoItem) {
     this.setState({
       items: [...this.state.items, todoItem.newItem]
-    });
+    })
   }
 
   onClear() {
@@ -36,13 +21,28 @@ export default class App extends React.Component {
       items: []
     })
   }
+
+  render() {
+    const list = this.state.items.map((item, index) => {
+      return (
+        <li key={index}><TodoItem item={item} /></li>
+      )
+    })
+
+    return (
+      <div>
+        <ul>{list}</ul>
+        <NewTodoItem addEvent={::this.addEvent} onClear={::this.onClear} />
+      </div>
+    )
+  }
 }
 
 class TodoItem extends React.Component {
   render(){
     return(
       <div>
-        <p>{this.props.item}</p>
+        <a>{`[#${this.props.item.id}] ${this.props.item.title}`}</a>
       </div>
     )
   }
@@ -51,33 +51,47 @@ class TodoItem extends React.Component {
 class NewTodoItem extends React.Component {
   constructor(props){
     super(props)
-    this.onSubmit = this.onSubmit.bind(this);
-    this.onClear = this.onClear.bind(this);
   }
 
   componentDidMount(){
-    ReactDOM.findDOMNode(this.refs.itemName).focus();
+    ReactDOM.findDOMNode(this.refs.itemName).focus()
+  }
+
+  onClear() {
+    this.props.onClear()
+    window.TodoPlugin.props.onItemsCleared()
+  }
+
+  onSubmit() {
+    const input = ReactDOM.findDOMNode(this.refs.itemName)
+    this.persistItem(input.value)
+
+    input.value = ''
+    window.TodoPlugin.props.onItemAdd()
+  }
+
+  persistItem(itemTitle) {
+    fetch('https://todo-backend-rails.herokuapp.com', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ title: itemTitle })
+    }).then((response) => {
+      return response.json()
+    }).then((jsonData) => {
+      this.props.addEvent({ jsonData })
+    })
   }
 
   render(){
     return(
-      <div>
-        <input ref="itemName" type="text" />
-        <a type="submit" onClick={this.onSubmit}>Add</a>
-        <a onClick={this.onClear}>Clear</a>
+      <div className="input-group">
+        <span className="input-group-addon" onClick={::this.onClear}>x</span>
+        <input className="form-control" ref="itemName" type="text" />
+        <span className="input-group-addon" onClick={::this.onSubmit}>+</span>
       </div>
     )
-  }
-
-  onClear() {
-    console.log("cleared")
-    this.props.onClear()
-  }
-
-  onSubmit() {
-    var input = ReactDOM.findDOMNode(this.refs.itemName)
-    var newItem = input.value;
-    this.props.addEvent({ newItem });
-    input.value = '';
   }
 }

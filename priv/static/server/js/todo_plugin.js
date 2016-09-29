@@ -83,13 +83,24 @@ module.exports =
 	    _this.state = {
 	      items: _this.props.items
 	    };
-
-	    _this.addEvent = _this.addEvent.bind(_this);
-	    _this.onClear = _this.onClear.bind(_this);
 	    return _this;
 	  }
 
 	  _createClass(App, [{
+	    key: "addEvent",
+	    value: function addEvent(todoItem) {
+	      this.setState({
+	        items: [].concat(_toConsumableArray(this.state.items), [todoItem.newItem])
+	      });
+	    }
+	  }, {
+	    key: "onClear",
+	    value: function onClear() {
+	      this.setState({
+	        items: []
+	      });
+	    }
+	  }, {
 	    key: "render",
 	    value: function render() {
 	      var list = this.state.items.map(function (item, index) {
@@ -108,22 +119,8 @@ module.exports =
 	          null,
 	          list
 	        ),
-	        _react2.default.createElement(NewTodoItem, { addEvent: this.addEvent, onClear: this.onClear })
+	        _react2.default.createElement(NewTodoItem, { addEvent: this.addEvent.bind(this), onClear: this.onClear.bind(this) })
 	      );
-	    }
-	  }, {
-	    key: "addEvent",
-	    value: function addEvent(todoItem) {
-	      this.setState({
-	        items: [].concat(_toConsumableArray(this.state.items), [todoItem.newItem])
-	      });
-	    }
-	  }, {
-	    key: "onClear",
-	    value: function onClear() {
-	      this.setState({
-	        items: []
-	      });
 	    }
 	  }]);
 
@@ -148,9 +145,9 @@ module.exports =
 	        "div",
 	        null,
 	        _react2.default.createElement(
-	          "p",
+	          "a",
 	          null,
-	          this.props.item
+	          "[#" + this.props.item.id + "] " + this.props.item.title
 	        )
 	      );
 	    }
@@ -165,11 +162,7 @@ module.exports =
 	  function NewTodoItem(props) {
 	    _classCallCheck(this, NewTodoItem);
 
-	    var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(NewTodoItem).call(this, props));
-
-	    _this3.onSubmit = _this3.onSubmit.bind(_this3);
-	    _this3.onClear = _this3.onClear.bind(_this3);
-	    return _this3;
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(NewTodoItem).call(this, props));
 	  }
 
 	  _createClass(NewTodoItem, [{
@@ -178,37 +171,56 @@ module.exports =
 	      _reactDom2.default.findDOMNode(this.refs.itemName).focus();
 	    }
 	  }, {
-	    key: "render",
-	    value: function render() {
-	      return _react2.default.createElement(
-	        "div",
-	        null,
-	        _react2.default.createElement("input", { ref: "itemName", type: "text" }),
-	        _react2.default.createElement(
-	          "a",
-	          { type: "submit", onClick: this.onSubmit },
-	          "Add"
-	        ),
-	        _react2.default.createElement(
-	          "a",
-	          { onClick: this.onClear },
-	          "Clear"
-	        )
-	      );
-	    }
-	  }, {
 	    key: "onClear",
 	    value: function onClear() {
-	      console.log("cleared");
 	      this.props.onClear();
+	      window.TodoPlugin.props.onItemsCleared();
 	    }
 	  }, {
 	    key: "onSubmit",
 	    value: function onSubmit() {
 	      var input = _reactDom2.default.findDOMNode(this.refs.itemName);
-	      var newItem = input.value;
-	      this.props.addEvent({ newItem: newItem });
+	      this.persistItem(input.value);
+
 	      input.value = '';
+	      window.TodoPlugin.props.onItemAdd();
+	    }
+	  }, {
+	    key: "persistItem",
+	    value: function persistItem(itemTitle) {
+	      var _this4 = this;
+
+	      fetch('https://todo-backend-rails.herokuapp.com', {
+	        method: 'POST',
+	        headers: {
+	          'Accept': 'application/json',
+	          'Content-Type': 'application/json'
+	        },
+	        body: JSON.stringify({ title: itemTitle })
+	      }).then(function (response) {
+	        return response.json();
+	      }).then(function (jsonData) {
+	        _this4.props.addEvent({ jsonData: jsonData });
+	      });
+	    }
+	  }, {
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement(
+	        "div",
+	        { className: "input-group" },
+	        _react2.default.createElement(
+	          "span",
+	          { className: "input-group-addon", onClick: this.onClear.bind(this) },
+	          "x"
+	        ),
+	        _react2.default.createElement("input", { className: "form-control", ref: "itemName", type: "text" }),
+	        _react2.default.createElement(
+	          "span",
+	          { className: "input-group-addon", onClick: this.onSubmit.bind(this) },
+	          "+"
+	        )
+	      );
 	    }
 	  }]);
 

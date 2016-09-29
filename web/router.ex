@@ -17,5 +17,6 @@ defmodule TodoPlugin.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+    get "/about", PageController, :about
   end
 end

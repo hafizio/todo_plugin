@@ -4889,10 +4889,6 @@ a.text-danger:focus, a.text-danger:hover {
   .hidden-print {
     display: none !important; } }
 
-main {
-  background-color: #f7f7f9;
-  max-height: 500px; }
-
 footer {
   background-color: #818a91;
   height: 50px;
@@ -4902,6 +4898,11 @@ footer {
   footer p {
     text-align: center;
     color: white; }
+
+main {
+  background-color: #f7f7f9;
+  padding: 1rem;
+  min-height: 196px; }
 
 .turbolinks-progress-bar {
   background-color: #e8c11e; }

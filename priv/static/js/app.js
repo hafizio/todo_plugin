@@ -10321,19 +10321,26 @@
 	
 	function initXChild() {
 	  window.Todo = _xcomponent2.default.create({
-	    tag: 'postco-widget',
-	    //url: 'https://todo-plugin-staging.herokuapp.com/map',
-	    url: 'https://c48acd39.ngrok.io/map',
+	    tag: 'todo-widget',
+	    url: 'https://f9544005.ngrok.io',
 	    singleton: true,
 	    props: {
-	      apiKey: {
+	      apiToken: {
 	        type: 'string',
+	        required: true
+	      },
+	      onItemAdd: {
+	        type: 'function',
+	        required: true
+	      },
+	      onItemsCleared: {
+	        type: 'function',
 	        required: true
 	      }
 	    },
 	    dimensions: {
 	      width: 375,
-	      height: 667
+	      height: 300
 	    },
 	    contexts: {
 	      iframe: true,
@@ -10345,7 +10352,7 @@
 	}
 	
 	function attachXChild() {
-	  window.Todo.attach({});
+	  window.TodoPlugin = window.Todo.attach({});
 	}
 
 /***/ },
@@ -19020,50 +19027,25 @@
 	  _createClass(Page, [{
 	    key: "index",
 	    value: function index() {
-	      initializeComponent();
-	      attachComponent();
+	      renderTodoApp();
 	    }
 	  }]);
 	
 	  return Page;
 	}();
 	
-	function initializeComponent() {
-	  window.todo = xcomponent.create({
-	    tag: 'todo-app',
-	    url: 'https://689abfc5.ngrok.io',
-	    singleton: true,
-	    props: {
-	      api_token: {
-	        type: 'string',
-	        required: true
-	      }
-	    },
-	    dimensions: {
-	      width: 375,
-	      height: 667
-	    },
-	    contexts: {
-	      iframe: true,
-	      lightbox: false,
-	      popup: false
-	    },
-	    defaultContext: 'iframe'
-	  });
-	}
-	
-	function attachComponent() {
-	  window.todo.attach({
-	    onEnter: function onEnter() {
-	      renderMap(this.props.api_token);
-	    }
-	  });
-	}
-	
 	function renderTodoApp() {
-	  var list = [{ id: 1, title: 'Hafiz' }, { id: 2, title: 'Atiqah' }, { id: 3, title: 'Wafa' }];
-	
-	  _reactDom2.default.render(_react2.default.createElement(_app2.default, { list: list }), document.getElementById("react-component-todo"));
+	  fetch("https://todo-backend-rails.herokuapp.com", {
+	    method: "GET",
+	    headers: {
+	      "Accept": "application/json",
+	      "Content-Type": "application/json"
+	    }
+	  }).then(function (response) {
+	    return response.json();
+	  }).then(function (jsonData) {
+	    _reactDom2.default.render(_react2.default.createElement(_app2.default, { items: jsonData }), document.getElementById("react-component-todo-app"));
+	  });
 	}
 
 /***/ },
@@ -40459,13 +40441,24 @@
 	    _this.state = {
 	      items: _this.props.items
 	    };
-	
-	    _this.addEvent = _this.addEvent.bind(_this);
-	    _this.onClear = _this.onClear.bind(_this);
 	    return _this;
 	  }
 	
 	  _createClass(App, [{
+	    key: "addEvent",
+	    value: function addEvent(todoItem) {
+	      this.setState({
+	        items: [].concat(_toConsumableArray(this.state.items), [todoItem.newItem])
+	      });
+	    }
+	  }, {
+	    key: "onClear",
+	    value: function onClear() {
+	      this.setState({
+	        items: []
+	      });
+	    }
+	  }, {
 	    key: "render",
 	    value: function render() {
 	      var list = this.state.items.map(function (item, index) {
@@ -40484,22 +40477,8 @@
 	          null,
 	          list
 	        ),
-	        _react2.default.createElement(NewTodoItem, { addEvent: this.addEvent, onClear: this.onClear })
+	        _react2.default.createElement(NewTodoItem, { addEvent: this.addEvent.bind(this), onClear: this.onClear.bind(this) })
 	      );
-	    }
-	  }, {
-	    key: "addEvent",
-	    value: function addEvent(todoItem) {
-	      this.setState({
-	        items: [].concat(_toConsumableArray(this.state.items), [todoItem.newItem])
-	      });
-	    }
-	  }, {
-	    key: "onClear",
-	    value: function onClear() {
-	      this.setState({
-	        items: []
-	      });
 	    }
 	  }]);
 	
@@ -40524,9 +40503,9 @@
 	        "div",
 	        null,
 	        _react2.default.createElement(
-	          "p",
+	          "a",
 	          null,
-	          this.props.item
+	          "[#" + this.props.item.id + "] " + this.props.item.title
 	        )
 	      );
 	    }
@@ -40541,11 +40520,7 @@
 	  function NewTodoItem(props) {
 	    _classCallCheck(this, NewTodoItem);
 	
-	    var _this3 = _possibleConstructorReturn(this, Object.getPrototypeOf(NewTodoItem).call(this, props));
-	
-	    _this3.onSubmit = _this3.onSubmit.bind(_this3);
-	    _this3.onClear = _this3.onClear.bind(_this3);
-	    return _this3;
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(NewTodoItem).call(this, props));
 	  }
 	
 	  _createClass(NewTodoItem, [{
@@ -40554,37 +40529,56 @@
 	      _reactDom2.default.findDOMNode(this.refs.itemName).focus();
 	    }
 	  }, {
-	    key: "render",
-	    value: function render() {
-	      return _react2.default.createElement(
-	        "div",
-	        null,
-	        _react2.default.createElement("input", { ref: "itemName", type: "text" }),
-	        _react2.default.createElement(
-	          "a",
-	          { type: "submit", onClick: this.onSubmit },
-	          "Add"
-	        ),
-	        _react2.default.createElement(
-	          "a",
-	          { onClick: this.onClear },
-	          "Clear"
-	        )
-	      );
-	    }
-	  }, {
 	    key: "onClear",
 	    value: function onClear() {
-	      console.log("cleared");
 	      this.props.onClear();
+	      window.TodoPlugin.props.onItemsCleared();
 	    }
 	  }, {
 	    key: "onSubmit",
 	    value: function onSubmit() {
 	      var input = _reactDom2.default.findDOMNode(this.refs.itemName);
-	      var newItem = input.value;
-	      this.props.addEvent({ newItem: newItem });
+	      this.persistItem(input.value);
+	
 	      input.value = '';
+	      window.TodoPlugin.props.onItemAdd();
+	    }
+	  }, {
+	    key: "persistItem",
+	    value: function persistItem(itemTitle) {
+	      var _this4 = this;
+	
+	      fetch('https://todo-backend-rails.herokuapp.com', {
+	        method: 'POST',
+	        headers: {
+	          'Accept': 'application/json',
+	          'Content-Type': 'application/json'
+	        },
+	        body: JSON.stringify({ title: itemTitle })
+	      }).then(function (response) {
+	        return response.json();
+	      }).then(function (jsonData) {
+	        _this4.props.addEvent({ jsonData: jsonData });
+	      });
+	    }
+	  }, {
+	    key: "render",
+	    value: function render() {
+	      return _react2.default.createElement(
+	        "div",
+	        { className: "input-group" },
+	        _react2.default.createElement(
+	          "span",
+	          { className: "input-group-addon", onClick: this.onClear.bind(this) },
+	          "x"
+	        ),
+	        _react2.default.createElement("input", { className: "form-control", ref: "itemName", type: "text" }),
+	        _react2.default.createElement(
+	          "span",
+	          { className: "input-group-addon", onClick: this.onSubmit.bind(this) },
+	          "+"
+	        )
+	      );
 	    }
 	  }]);
 	
