@@ -90,7 +90,7 @@ module.exports =
 	    key: "addEvent",
 	    value: function addEvent(todoItem) {
 	      this.setState({
-	        items: [].concat(_toConsumableArray(this.state.items), [todoItem.newItem])
+	        items: [].concat(_toConsumableArray(this.state.items), [todoItem])
 	      });
 	    }
 	  }, {
@@ -98,6 +98,16 @@ module.exports =
 	    value: function onClear() {
 	      this.setState({
 	        items: []
+	      });
+
+	      this.clearItems();
+	      window.TodoPlugin.props.onItemsCleared();
+	    }
+	  }, {
+	    key: "clearItems",
+	    value: function clearItems() {
+	      fetch('https://todo-backend-rails.herokuapp.com', {
+	        method: 'DELETE'
 	      });
 	    }
 	  }, {
@@ -174,7 +184,6 @@ module.exports =
 	    key: "onClear",
 	    value: function onClear() {
 	      this.props.onClear();
-	      window.TodoPlugin.props.onItemsCleared();
 	    }
 	  }, {
 	    key: "onSubmit",
@@ -200,7 +209,7 @@ module.exports =
 	      }).then(function (response) {
 	        return response.json();
 	      }).then(function (jsonData) {
-	        _this4.props.addEvent({ jsonData: jsonData });
+	        _this4.props.addEvent(jsonData);
 	      });
 	    }
 	  }, {

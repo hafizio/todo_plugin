@@ -10322,7 +10322,7 @@
 	function initXChild() {
 	  window.Todo = _xcomponent2.default.create({
 	    tag: 'todo-widget',
-	    url: 'https://f9544005.ngrok.io',
+	    url: 'https://071f9794.ngrok.io',
 	    singleton: true,
 	    props: {
 	      apiToken: {
@@ -40448,7 +40448,7 @@
 	    key: "addEvent",
 	    value: function addEvent(todoItem) {
 	      this.setState({
-	        items: [].concat(_toConsumableArray(this.state.items), [todoItem.newItem])
+	        items: [].concat(_toConsumableArray(this.state.items), [todoItem])
 	      });
 	    }
 	  }, {
@@ -40456,6 +40456,16 @@
 	    value: function onClear() {
 	      this.setState({
 	        items: []
+	      });
+	
+	      this.clearItems();
+	      window.TodoPlugin.props.onItemsCleared();
+	    }
+	  }, {
+	    key: "clearItems",
+	    value: function clearItems() {
+	      fetch('https://todo-backend-rails.herokuapp.com', {
+	        method: 'DELETE'
 	      });
 	    }
 	  }, {
@@ -40532,7 +40542,6 @@
 	    key: "onClear",
 	    value: function onClear() {
 	      this.props.onClear();
-	      window.TodoPlugin.props.onItemsCleared();
 	    }
 	  }, {
 	    key: "onSubmit",
@@ -40558,7 +40567,7 @@
 	      }).then(function (response) {
 	        return response.json();
 	      }).then(function (jsonData) {
-	        _this4.props.addEvent({ jsonData: jsonData });
+	        _this4.props.addEvent(jsonData);
 	      });
 	    }
 	  }, {

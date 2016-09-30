@@ -2,7 +2,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 
 export default class App extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props)
   }
 
@@ -12,13 +12,22 @@ export default class App extends React.Component {
 
   addEvent(todoItem) {
     this.setState({
-      items: [...this.state.items, todoItem.newItem]
+      items: [...this.state.items, todoItem]
     })
   }
 
   onClear() {
     this.setState({
       items: []
+    })
+
+    this.clearItems()
+    window.TodoPlugin.props.onItemsCleared()
+  }
+
+  clearItems() {
+    fetch('https://todo-backend-rails.herokuapp.com', {
+      method: 'DELETE'
     })
   }
 
@@ -49,17 +58,16 @@ class TodoItem extends React.Component {
 }
 
 class NewTodoItem extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props)
   }
 
-  componentDidMount(){
+  componentDidMount() {
     ReactDOM.findDOMNode(this.refs.itemName).focus()
   }
 
   onClear() {
     this.props.onClear()
-    window.TodoPlugin.props.onItemsCleared()
   }
 
   onSubmit() {
@@ -81,7 +89,7 @@ class NewTodoItem extends React.Component {
     }).then((response) => {
       return response.json()
     }).then((jsonData) => {
-      this.props.addEvent({ jsonData })
+      this.props.addEvent(jsonData)
     })
   }
 

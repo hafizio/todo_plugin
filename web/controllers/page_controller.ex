@@ -1,7 +1,7 @@
 defmodule TodoPlugin.PageController do
   use TodoPlugin.Web, :controller
 
-  def index(conn, params) do
+  def index(conn, _params) do
     RailsApi.start
     todos = RailsApi.get!("/").body
 
