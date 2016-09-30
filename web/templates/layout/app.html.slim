@@ -8,10 +8,10 @@ html lang="en"
     meta name="author" content=""
     title todo Plugin
     link rel="stylesheet" href="#{static_path(@conn, "/css/app.css")}" data-turbolinks-track="reload"
+    script src="#{static_path(@conn, "/js/app.js")}" data-turbolinks-track="reload"
   body class=body_css_class(@conn) data-view=data_view(@conn) data-debug=data_debug
     = render "navbar.html", conn: @conn
     main
       = show_flash(@conn)
       = render @view_module, @view_template, assigns 
     = render "footer.html", conn: @conn 
-    script src="#{static_path(@conn, "/js/app.js")}" data-turbolinks-track="reload"

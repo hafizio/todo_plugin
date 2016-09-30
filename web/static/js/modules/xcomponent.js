@@ -8,7 +8,7 @@ import xcomponent from "xcomponent/dist/xcomponent"
 function initXChild() {
   window.Todo = xcomponent.create({
     tag: 'todo-widget',
-    url: 'https://071f9794.ngrok.io',
+    url: 'https://035ffa75.ngrok.io',
     singleton: true,
     props: {
       apiToken: {

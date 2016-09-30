@@ -10322,7 +10322,7 @@
 	function initXChild() {
 	  window.Todo = _xcomponent2.default.create({
 	    tag: 'todo-widget',
-	    url: 'https://071f9794.ngrok.io',
+	    url: 'https://035ffa75.ngrok.io',
 	    singleton: true,
 	    props: {
 	      apiToken: {
